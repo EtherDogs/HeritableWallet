@@ -21,3 +21,11 @@ You can use this contract to store your funds, send funds to an account of your 
 * If you don't need the contract anymore you can call ```destroy()``` method which will return all funds to the owner's address.
 
 * Finally and most importantly, a designated heir can claim his share in the inheritance once the owner hasn't checked in for the period of time set in the contract. Heirs should use ```requestInheritance()``` method for this. If conditions apply a specific share of the funds will be transferred to the heir's address, also removing the heir from the list of heirs so that he can claim the inheritance only once.
+
+# Disclaimer #
+
+Make sure you **read, understand and test the code** before using it on the Main Ethereum Network. 
+
+I strongly encourage you to deploy the contract on the a test net as this was not tested enough.
+
+Enjoy!
