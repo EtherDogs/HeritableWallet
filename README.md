@@ -26,6 +26,6 @@ You can use this contract to store your funds, send funds to an account of your 
 
 Make sure you **read, understand and test the code** before using it on the Main Ethereum Network. 
 
-I strongly encourage you to deploy the contract on the a test net as this was not tested enough.
+I strongly encourage you to deploy the contract on a testnet as this was not tested enough yet to be considered safe to use.
 
 Enjoy!
