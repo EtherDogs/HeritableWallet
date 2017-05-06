@@ -1,9 +1,9 @@
 # Simple deposit contract with inhertance feature. #
----
+
 You can use this contract to store your funds, send funds to an account of your choice and add heirs that will inherit the funds if you are not able to access them anymore, for example, in case of death.
 
 # Usage #
---- 
+
 * Deploy this contract to the Ethereum blockchain (using Mist for example).
 
 * Send funds directly to the contract address to make deposits.
