@@ -1,4 +1,4 @@
-# Simple deposit contract with inhertance feature. #
+# Simple deposit contract with inheritance feature. #
 
 You can use this contract to store your funds, send funds to an account of your choice and add heirs that will inherit the funds if you are not able to access them anymore, for example, in case of death.
 
