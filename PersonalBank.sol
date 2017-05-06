@@ -6,8 +6,7 @@ contract PersonalBank {
 	uint checkInDeadline;
 	uint checkInPeriod;
 	mapping(address => uint8) public points;
-	address[] heirs;
-	uint8 heirsNumber = 0;
+	address[] public heirs;
 	
 	/* constructor */
 	function PersonalBank() {
@@ -19,11 +18,11 @@ contract PersonalBank {
 	
 	/* get the index of an heir */
 	function indexOfHeir(address heir) private returns(int) {
-		uint8 i = heirsNumber;
+		uint i = heirs.length;
 		while (i > 0) {
 			i--;
 			if (heirs[i] == heir) {
-				return i;
+				return int(i);
 			}
 		}
 		return -1;
@@ -55,7 +54,7 @@ contract PersonalBank {
 	function setHeir(address heir, uint8 inheritancePoints) onlyOwner {
 		int heirIndex = indexOfHeir(heir);
 		if (heirIndex < 0) { // not a heir
-			heirIndex = heirsNumber;
+			heirIndex = int(heirs.length);
 			heirs.push(heir);
 		}
 		points[heirs[uint256(heirIndex)]] = inheritancePoints;
@@ -66,8 +65,8 @@ contract PersonalBank {
 		int heirIndex = indexOfHeir(heir);
 		if (heirIndex >= 0) { // is a heir
 			delete points[heir];
-			heirs[uint256(heirIndex)] = heirs[heirsNumber - 1];
-			heirsNumber--;
+			heirs[uint256(heirIndex)] = heirs[heirs.length - 1];
+			heirs.length--;
 		}
 	}
 	
@@ -77,7 +76,7 @@ contract PersonalBank {
 		int heirIndex = indexOfHeir(msg.sender);
 		if (heirIndex < 0) throw; // not a heir
 		uint totalPoints = 0;
-		for (uint8 i = 0; i < heirsNumber; i++) {
+		for (uint8 i = 0; i < heirs.length; i++) {
 			totalPoints += points[heirs[i]];
 		}
 		uint amount = this.balance * points[heirs[uint256(heirIndex)]] / totalPoints;
@@ -86,7 +85,7 @@ contract PersonalBank {
 		}
 		msg.sender.transfer(amount);
 		removeHeir(msg.sender);
-		if (heirsNumber == 0) {
+		if (heirs.length == 0) {
 			selfdestruct(owner);
 		}
 	}
