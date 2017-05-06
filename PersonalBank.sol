@@ -28,6 +28,9 @@ contract PersonalBank {
 		return -1;
 	}
 	
+	/* anyone can deposit funds by sending funds to the contract address */
+	function () payable {}
+	
 	/* called by owner to prove he is alive */
 	function checkIn() onlyOwner {
 		checkInDeadline = now + checkInPeriod * 1 days;
@@ -84,7 +87,9 @@ contract PersonalBank {
 			amount = this.balance;
 		}
 		msg.sender.transfer(amount);
-		removeHeir(msg.sender);
+		delete points[msg.sender];
+		heirs[uint256(heirIndex)] = heirs[heirs.length - 1];
+		heirs.length--;
 		if (heirs.length == 0) {
 			selfdestruct(owner);
 		}
