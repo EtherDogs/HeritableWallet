@@ -14,9 +14,7 @@ You can use this contract to store your funds, send funds to an account of your 
 
 * Use ```sendFunds(address receiver, uint amount)``` method to send a chosen amount to a specific address.
 
-* Add an heir by calling ```setHeir(address heir, uint8 inheritancePoints)``` specifying the heir's Ethereum address and number of points. Heirs will get a share in the inheritance directly proportional with their number points. You can think of these as percentages.
-
-* You can also remove an heir by calling ```removeHeir(address heir)```.
+* Add an heir by calling ```setHeir(address heir, uint8 inheritancePoints)``` specifying the heir's Ethereum address and number of points. Heirs will get a share in the inheritance directly proportional with their number points. You can think of these as percentages. To remove an heir you need just to call this method with a 0 value for points.
 
 * If you don't need the contract anymore you can call ```destroy()``` method which will return all funds to the owner's address.
 

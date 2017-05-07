@@ -3,10 +3,10 @@ pragma solidity ^0.4.10;
 contract PersonalBank {
 	
 	address public owner;
+	mapping(address => uint8) public points;
 	uint checkInDeadline;
 	uint checkInPeriod;
-	mapping(address => uint8) public points;
-	address[] public heirs;
+	uint public totalPoints = 0;
 	
 	/* constructor */
 	function PersonalBank() {
@@ -15,18 +15,7 @@ contract PersonalBank {
 	}
 	
 	modifier onlyOwner() { if (msg.sender != owner) throw; _; }
-	
-	/* get the index of an heir */
-	function indexOfHeir(address heir) private returns(int) {
-		uint i = heirs.length;
-		while (i > 0) {
-			i--;
-			if (heirs[i] == heir) {
-				return int(i);
-			}
-		}
-		return -1;
-	}
+	modifier onlyHeir() { if (points[msg.sender] == 0) throw; _; }
 	
 	/* anyone can deposit funds by sending funds to the contract address */
 	function () payable {}
@@ -36,63 +25,43 @@ contract PersonalBank {
 		checkInDeadline = now + checkInPeriod * 1 days;
 	}
 	
-	/* called by owner to send funds to custom accounts */
-	function sendFunds(address receiver, uint amount) onlyOwner returns(bool success) {
-		if (this.balance < amount) throw;
-		return receiver.send(amount);
-	}
-	
-	/* called by owner to terminate this contract */
-	function destroy() onlyOwner {
-		selfdestruct(owner);
-	}
-	
 	/* called by owner to change check in period */
 	function setCheckInPeriod(uint period) onlyOwner {
 		checkInPeriod = period;
 		checkIn();
 	}
 	
-	/* called by owner to add/modify an heir; inheritance shares are deducted from the points assigned */
-	function setHeir(address heir, uint8 inheritancePoints) onlyOwner {
-		int heirIndex = indexOfHeir(heir);
-		if (heirIndex < 0) { // not a heir
-			heirIndex = int(heirs.length);
-			heirs.push(heir);
-		}
-		points[heirs[uint256(heirIndex)]] = inheritancePoints;
+	/* called by owner to send funds to custom accounts */
+	function sendFunds(address receiver, uint amount) onlyOwner returns(bool success) {
+		if (this.balance < amount) throw;
+		return receiver.send(amount);
 	}
 	
-	/* called by owner to remove an heir */
-	function removeHeir(address heir) onlyOwner {
-		int heirIndex = indexOfHeir(heir);
-		if (heirIndex >= 0) { // is a heir
-			delete points[heir];
-			heirs[uint256(heirIndex)] = heirs[heirs.length - 1];
-			heirs.length--;
-		}
+	/* called by owner to add/modify an heir; inheritance shares are directly proportional to the points assigned */
+	function setHeir(address heir, uint8 inheritancePoints) onlyOwner {
+		totalPoints -= points[heir];
+		points[heir] = inheritancePoints;
+		totalPoints += inheritancePoints;
 	}
 	
 	/* called by an heir to request his share in the inheritance */
-	function requestInheritance() {
+	function requestInheritance() onlyHeir {
 		if (now <= checkInDeadline) throw; // owner not dead
-		int heirIndex = indexOfHeir(msg.sender);
-		if (heirIndex < 0) throw; // not a heir
-		uint totalPoints = 0;
-		for (uint8 i = 0; i < heirs.length; i++) {
-			totalPoints += points[heirs[i]];
-		}
-		uint amount = this.balance * points[heirs[uint256(heirIndex)]] / totalPoints;
+		uint amount = this.balance * points[msg.sender] / totalPoints;
 		if (this.balance < amount) {
 			amount = this.balance;
 		}
 		msg.sender.transfer(amount);
+		totalPoints -= points[msg.sender];
 		delete points[msg.sender];
-		heirs[uint256(heirIndex)] = heirs[heirs.length - 1];
-		heirs.length--;
-		if (heirs.length == 0) {
+		if (totalPoints == 0) {
 			selfdestruct(owner);
 		}
+	}
+	
+	/* called by owner to terminate this contract */
+	function destroy() onlyOwner {
+		selfdestruct(owner);
 	}
 	
 }
