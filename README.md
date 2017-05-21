@@ -10,9 +10,11 @@ You can use this contract to store your funds, send funds to an account of your 
 
 * To prove you are alive and active use ```checkIn()``` method periodically (default period is set to 365 days). This will extend the active status of the owner for the period specified in the contract.
 
-* To change the check in period you can call ```setCheckInPeriod(uint period)``` by specifying the period in days.
+* To change the check-in period you can call ```setCheckInPeriod(uint periodInDays)``` by specifying the period in days.
 
 * Use ```sendFunds(address receiver, uint amount)``` method to send a chosen amount to a specific address.
+
+* To change ownership of the contract you can use ```transferOwnership(address newOwner)``` giving the new owner address as argument.
 
 * Add an heir by calling ```setHeir(address heir, uint8 inheritancePoints)``` specifying the heir's Ethereum address and number of points. Heirs will get a share in the inheritance directly proportional with their number points. You can think of these as percentages. To remove an heir you need just to call this method with a 0 value for points.
 
