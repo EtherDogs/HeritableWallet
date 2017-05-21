@@ -4,37 +4,46 @@ contract PersonalBank {
 	
 	address public owner;
 	mapping(address => uint8) public points;
-	uint checkInDeadline;
-	uint checkInPeriod;
+	uint public lastCheckInTime;
+	uint public checkInPeriod;
 	uint public totalPoints = 0;
 	
 	/* constructor */
 	function PersonalBank() {
 		owner = msg.sender;
-		setCheckInPeriod(365);
+		setCheckInPeriod(365); // 1 year default period
 	}
-	
-	modifier onlyOwner() { if (msg.sender != owner) throw; _; }
-	modifier onlyHeir() { if (points[msg.sender] == 0) throw; _; }
 	
 	/* anyone can deposit funds by sending funds to the contract address */
-	function () payable {}
+	function() payable {}
 	
-	/* called by owner to prove he is alive */
-	function checkIn() onlyOwner {
-		checkInDeadline = now + checkInPeriod * 1 days;
+	modifier onlyOwner() { 
+		if (msg.sender != owner) throw; 
+		_; // function body
+		lastCheckInTime = now;
 	}
 	
+	modifier onlyHeir() { 
+		if (points[msg.sender] == 0) throw; 
+		_; // function body
+	}
+	
+	/* called by owner to prove he is alive */
+	function checkIn() onlyOwner {}
+	
 	/* called by owner to change check in period */
-	function setCheckInPeriod(uint period) onlyOwner {
-		checkInPeriod = period;
-		checkIn();
+	function setCheckInPeriod(uint periodInDays) onlyOwner {
+		checkInPeriod = periodInDays * 1 days;
 	}
 	
 	/* called by owner to send funds to custom accounts */
-	function sendFunds(address receiver, uint amount) onlyOwner returns(bool success) {
-		if (this.balance < amount) throw;
-		return receiver.send(amount);
+	function sendFunds(address receiver, uint amount) onlyOwner {
+		receiver.transfer(amount);
+	}
+	
+	/* called by owner to change ownership */
+	function transferOwnership(address newOwner) onlyOwner {
+		owner = newOwner;
 	}
 	
 	/* called by owner to add/modify an heir; inheritance shares are directly proportional to the points assigned */
@@ -46,15 +55,17 @@ contract PersonalBank {
 	
 	/* called by an heir to request his share in the inheritance */
 	function requestInheritance() onlyHeir {
-		if (now <= checkInDeadline) throw; // owner not dead
-		uint amount = this.balance * points[msg.sender] / totalPoints;
-		if (this.balance < amount) {
-			amount = this.balance;
-		}
-		msg.sender.transfer(amount);
-		totalPoints -= points[msg.sender];
+		if (now <= lastCheckInTime + checkInPeriod) throw; // owner was active recently
+		uint8 heirPoints = points[msg.sender];
+		uint amount = this.balance * heirPoints / totalPoints; // compute amount for current heir
+		totalPoints -= heirPoints;
 		delete points[msg.sender];
-		if (totalPoints == 0) {
+		if (!msg.sender.send(amount)) { // transfer proper amount to heir or revert state if it fails
+			totalPoints += heirPoints;
+			points[msg.sender] = heirPoints;
+			throw;
+		}
+		if (totalPoints == 0) { // last heir, destroy empty contract
 			selfdestruct(owner);
 		}
 	}
