@@ -1,6 +1,6 @@
 pragma solidity ^0.4.10;
 
-contract PersonalBank {
+contract HeritableWallet {
 	
 	address public owner;
 	mapping(address => uint8) public points;
@@ -9,7 +9,7 @@ contract PersonalBank {
 	uint public totalPoints = 0;
 	
 	/* constructor */
-	function PersonalBank() {
+	function HeritableWallet() {
 		owner = msg.sender;
 		setCheckInPeriod(365); // 1 year default period
 	}
