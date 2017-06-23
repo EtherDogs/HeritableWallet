@@ -1,4 +1,4 @@
-# Simple deposit contract with inheritance feature. #
+# Simple wallet contract with inheritance feature. #
 
 You can use this contract to store your funds, send funds to an account of your choice and add heirs that will inherit the funds if you are not able to access them anymore, for example, in case of death.
 
@@ -12,7 +12,7 @@ You can use this contract to store your funds, send funds to an account of your 
 
 * To change the check-in period you can call ```setCheckInPeriod(uint periodInDays)``` by specifying the period in days.
 
-* Use ```sendFunds(address receiver, uint amount)``` method to send a chosen amount to a specific address.
+* Use ```sendFunds(address receiver, uint amount, bytes data)``` method to send a chosen amount to a specific address along with extra data.
 
 * To change ownership of the contract you can use ```transferOwnership(address newOwner)``` giving the new owner address as argument.
 
@@ -20,7 +20,7 @@ You can use this contract to store your funds, send funds to an account of your 
 
 * If you don't need the contract anymore you can call ```destroy()``` method which will return all funds to the owner's address.
 
-* Finally and most importantly, a designated heir can claim his share in the inheritance once the owner hasn't checked in for the period of time set in the contract. Heirs should use ```requestInheritance()``` method for this. If conditions apply a specific share of the funds will be transferred to the heir's address, also removing the heir from the list of heirs so that he can claim the inheritance only once.
+* Finally and most importantly, a designated heir can claim his share in the inheritance once the owner hasn't checked in for the period of time set in the contract. Heirs should use ```claimInheritance()``` method for this. If conditions apply a specific share of the funds will be transferred to the heir's address, also removing the heir from the list of heirs so that he can claim the inheritance only once.
 
 # Disclaimer #
 

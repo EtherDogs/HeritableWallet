@@ -17,13 +17,13 @@ contract PersonalBank {
 	/* anyone can deposit funds by sending funds to the contract address */
 	function() payable {}
 	
-	modifier onlyOwner() { 
+	modifier onlyOwner() {
 		if (msg.sender != owner) throw; 
 		_; // function body
 		lastCheckInTime = now;
 	}
 	
-	modifier onlyHeir() { 
+	modifier onlyHeir() {
 		if (points[msg.sender] == 0) throw; 
 		_; // function body
 	}
@@ -36,9 +36,9 @@ contract PersonalBank {
 		checkInPeriod = periodInDays * 1 days;
 	}
 	
-	/* called by owner to send funds to custom accounts */
-	function sendFunds(address receiver, uint amount) onlyOwner {
-		receiver.transfer(amount);
+	/* called by owner to send funds with data to chosen destination */
+	function sendFunds(address destination, uint amount, bytes data) onlyOwner {
+		if (!destination.call.value(amount)(data)) throw;
 	}
 	
 	/* called by owner to change ownership */
@@ -53,8 +53,8 @@ contract PersonalBank {
 		totalPoints += inheritancePoints;
 	}
 	
-	/* called by an heir to request his share in the inheritance */
-	function requestInheritance() onlyHeir {
+	/* called by an heir to collect his share in the inheritance */
+	function claimInheritance() onlyHeir {
 		if (now <= lastCheckInTime + checkInPeriod) throw; // owner was active recently
 		uint8 heirPoints = points[msg.sender];
 		uint amount = this.balance * heirPoints / totalPoints; // compute amount for current heir
